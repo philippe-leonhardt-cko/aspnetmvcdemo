@@ -1,0 +1,28 @@
+﻿@model AspNetMvcDemo.Models.Order
+@{
+    ViewBag.Title = "Checkout.com Demo";
+    var CKOSecretKey = Environment.GetEnvironmentVariable("CKO_SECRET_KEY");
+    var CKOPublicKey = Environment.GetEnvironmentVariable("CKO_PUBLIC_KEY");
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+
+<form class="payment-form" id="payment-form"  method="POST" action='@Url.Action("Checkout", "Home")' >
+    <script>
+        window.CKOConfig = {
+            publicKey: '@CKOPublicKey',
+            customerEmail: '@Model.Cust.Email',
+            value: @(Model.Total*100),
+            currency: '@Model.Currency',
+            paymentMode: 'cards',
+            cardFormMode: 'cardTokenisation',
+            cardTokenised: function (event) {
+                // ... spinner
+                document.getElementById('cardToken').value = event.data.cardToken;
+                document.getElementById('payment-form').submit();
+            }
+        };
+    </script>
+    @Html.HiddenFor(x => x.CardToken, new { id = "cardToken" })
+    <script async src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
+</form>
